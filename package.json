@@ -4,5 +4,10 @@
   "main": "index.js",
   "repository": "https://github.com/akhellas/synapse-iris.git",
   "author": "Antonis Katarachias <akhellas@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.2",
+    "morgan": "^1.9.0",
+    "pug": "^2.0.0-rc.4"
+  }
 }

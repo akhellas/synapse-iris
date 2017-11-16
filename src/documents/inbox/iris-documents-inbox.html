@@ -1,0 +1,72 @@
+<template id="iris-documents-inbox">
+    <style>
+        p {
+            color: green;
+        }
+    </style>
+    <p>I'm in Shadow DOM. My markup was stamped from a &lt;template&gt;.</p>
+    <div>data binded to test
+        <strong data-bind="test"></strong>
+    </div>
+</template>
+
+<script>
+    class IrisDocumentsInbox extends HTMLElement {
+        static get observedAttributes() {
+            return ['test'];
+        }
+
+        constructor() {
+            super();
+
+            let shadowRoot = this.attachShadow({ mode: 'open' });
+            let tmpl = document.currentScript.ownerDocument.querySelector('#iris-documents-inbox');
+
+            shadowRoot.appendChild(tmpl.content.cloneNode(true));
+            bindData(this);
+        }
+
+        connectedCallback() {
+            console.log('IDI', 'connected');
+            this.innerHTML = "<b>iris-documents-inbox</b>";
+        }
+
+        disconnectedCallback() {
+            console.log('IDI', 'disconnected');
+        }
+
+        attributeChangedCallback(attrName, oldVal, newVal) {
+            console.log('IDI', 'attributeChanged', attrName, oldVal, newVal);
+            bindData(this);
+        }
+
+        bindData(el) {
+            let dataBind = el.shadow.querySelectorAll('[data-bind]');
+
+            for (let i = 0; i < dataBind.length; i++) {
+                let val = (el.attributes.getNamedItem(dataBind[i].getAttribute("data-bind")));
+                if (val) {
+                    // Special case of input - may also change the value:
+                    if (dataBind[i].nodeName == "INPUT") {
+                        dataBind[i].value = val.value;
+
+                        // Only add the listener once:
+                        if (!el.dataIsBound)
+                            dataBind[i].addEventListener("keyup", function () {
+                                val.value = dataBind[i].value;
+                                // Do bind again:
+                                bindData(el);
+                            });
+
+                    } else
+                        dataBind[i].innerText = val.value; // One way; just display the value
+                }
+            }
+            if (!el.dataIsBound)
+                el.dataIsBound = true;
+
+        }
+    }
+
+    customElements.define('iris-documents-inbox', IrisDocumentsInbox);
+</script>
